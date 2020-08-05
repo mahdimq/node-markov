@@ -16,41 +16,36 @@ class MarkovMachine {
 
 	makeChains() {
 		// TODO
-		let chain = {}
+		let chains = new Map()
 		for (let i = 0; i < this.words.length; i++) {
-			let currWord = this.words[i]
-			let nextWord = this.words[i + 1]
-
-			if (!chain[currWord]) {
-				chain[currWord] = [nextWord]
+			let nextWord = this.words[i + 1] || null
+			if (!chains.has(this.words[i])) {
+				chains.set(this.words[i], [nextWord])
 			} else {
-				chain[currWord].push(nextWord || null)
+				chains.get(this.words[i]).push(nextWord)
 			}
 		}
-		return chain
+		this.chains = chains
 	}
 
-	/** return random text from chains */
-	randomText(chain) {
-		return chain[Math.floor(Math.random() * chain.length)]
-	}
-
-	randomKeys() {
-		return this.words[Math.floor(Math.random() * this.words.length)]
+	// 	/** return random text from chains */
+	randomText(str) {
+		return str[Math.floor(Math.random() * str.length)]
 	}
 
 	makeText(numWords = 100) {
-		// TODO
-		let keys = this.randomKeys()
-		let output = keys
-		for (let i = 0; i < numWords; i++) {
-			let currWord = this.randomText(keys)
-			if (currWord) {
-				output += `${currWord}`
-				keys = currWord
-			} else break
+		let word = this.randomText(this.words)
+		let key = [word]
+
+		for (let i = 0; i < numWords - 1; i++) {
+			let words = this.chains.get(word)
+			word = this.randomText(words)
+			if (word === null) {
+				break
+			}
+			key.push(word)
 		}
-		return output
+		return key.join(' ')
 	}
 }
 
